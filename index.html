@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MJ - Advanced AI Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#020b16}
+:root{
+  --c:#00d4ff;--cb:#0055ff;--cg:#00ffaa;--co:#ff5500;--cp:#b040ff;
+  --txt:#cce8ff;--dim:#2e5a7a;--bdr:rgba(0,212,255,0.15);--bg:#020b16;
+  --glow:0 0 18px rgba(0,212,255,0.4);
+  --bg-light:#f5f5f5;--txt-dark:#1a1a1a;--dim-light:#666;
+}
+body{color:var(--txt);font-family:'Rajdhani',sans-serif;display:flex;flex-direction:column;transition:background .3s,color .3s}
+body.light-mode{background:var(--bg-light);color:var(--txt-dark)}
+
+/* BG */
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
+.bgg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 160% 60% at 50% 0%,rgba(0,85,255,.12)0%,transparent 65%),
+             radial-gradient(ellipse 60% 40% at 90% 100%,rgba(176,64,255,.06)0%,transparent 55%)}
+body.light-mode .bgg{background:radial-gradient(ellipse 160% 60% at 50% 0%,rgba(0,85,255,.06)0%,transparent 65%),
+             radial-gradient(ellipse 60% 40% at 90% 100%,rgba(176,64,255,.03)0%,transparent 55%)}
+
+/* HEADER */
+header{position:relative;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:rgba(2,11,22,.98);border-bottom:1px solid var(--bdr);flex-shrink:0}
+body.light-mode header{background:rgba(255,255,255,.95);border-bottom-color:rgba(0,0,0,.1)}
+.logo{display:flex;align-items:center;gap:10px}
+.lring{position:relative;width:38px;height:38px;flex-shrink:0}
+.lring svg{position:absolute;inset:0;animation:spin 4s linear infinite}
+.lring svg:nth-child(2){animation-direction:reverse;animation-duration:7s}
+.linner{position:absolute;inset:7px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#60cfff,var(--cb));
+  box-shadow:0 0 12px rgba(0,212,255,.7);display:flex;align-items:center;justify-content:center;
+  font-size:.58rem;color:#fff;font-weight:900;font-family:'Orbitron',sans-serif}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lname{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.4rem;letter-spacing:.2em;
+  background:linear-gradient(100deg,var(--c),var(--cb));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ltag{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:.2em;color:var(--dim);margin-top:2px}
+.hbtns{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.hbtn{padding:5px 11px;border-radius:20px;border:1px solid var(--bdr);font-family:'Share Tech Mono',monospace;
+  font-size:.55rem;color:var(--dim);background:transparent;cursor:pointer;transition:all .2s;white-space:nowrap}
+body.light-mode .hbtn{border-color:rgba(0,0,0,.2);color:var(--dim-light)}
+.hbtn.act{border-color:var(--cg);color:var(--cg);background:rgba(0,255,170,.07)}
+body.light-mode .hbtn.act{background:rgba(0,255,170,.15)}
+.hbtn:active{opacity:.7}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--cg);box-shadow:0 0 7px var(--cg);
+  animation:blink 2s ease infinite;display:inline-block;margin-right:3px;vertical-align:middle}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* MAIN */
+.main{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* TABS */
+.tab-nav{display:flex;gap:2px;padding:8px 12px;background:rgba(2,8,18,.6);border-bottom:1px solid var(--bdr);overflow-x:auto;flex-shrink:0}
+body.light-mode .tab-nav{background:rgba(255,255,255,.7)}
+.tab-btn{padding:6px 12px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--dim);
+  cursor:pointer;font-size:.7rem;font-family:'Share Tech Mono',monospace;transition:all .2s;white-space:nowrap}
+.tab-btn.active{border-color:var(--c);color:var(--c);background:rgba(0,212,255,.08)}
+body.light-mode .tab-btn.active{background:rgba(0,212,255,.15)}
+
+/* ORB */
+.orb-sec{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:16px 0 6px;
+  background:linear-gradient(180deg,rgba(0,55,120,.08)0%,transparent 100%)}
+body.light-mode .orb-sec{background:linear-gradient(180deg,rgba(0,55,120,.03)0%,transparent 100%)}
+.ow{position:relative;width:100px;height:100px;cursor:pointer;user-select:none}
+.or{position:absolute;border-radius:50%;border-style:solid;border-color:transparent;animation:rr linear infinite}
+.or1{inset:0;border-width:1px;border-top-color:rgba(0,212,255,.7);border-right-color:rgba(0,212,255,.25);animation-duration:3s}
+.or2{inset:12px;border-width:1px;border-top-color:rgba(0,85,255,.6);border-left-color:rgba(0,85,255,.25);animation-duration:5s;animation-direction:reverse}
+.or3{inset:23px;border-width:1px;border-bottom-color:rgba(0,255,170,.45);animation-duration:8s}
+@keyframes rr{to{transform:rotate(360deg)}}
+.oc{position:absolute;inset:32px;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#72d8ff,#0044cc);
+  box-shadow:0 0 20px rgba(0,212,255,.7),0 0 44px rgba(0,85,255,.3),inset 0 0 14px rgba(255,255,255,.15);
+  animation:cgl 3s ease-in-out infinite;transition:all .4s}
+@keyframes cgl{0%,100%{box-shadow:0 0 20px rgba(0,212,255,.7),0 0 44px rgba(0,85,255,.3),inset 0 0 14px rgba(255,255,255,.15)}
+  50%{box-shadow:0 0 32px rgba(0,212,255,1),0 0 66px rgba(0,85,255,.5),inset 0 0 20px rgba(255,255,255,.2)}}
+.oc.spk{background:radial-gradient(circle at 38% 32%,#90ffcc,#00aa55)!important;
+  animation:sp .3s ease-in-out infinite alternate!important}
+@keyframes sp{from{transform:scale(.94);box-shadow:0 0 14px rgba(0,255,136,.6)}to{transform:scale(1.1);box-shadow:0 0 30px rgba(0,255,136,.9)}}
+.ol{margin-top:9px;font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.18em;color:var(--dim);text-align:center}
+.ol.lit{color:var(--c)}
+
+/* WAVE */
+.wf{display:flex;align-items:center;justify-content:center;gap:3px;height:22px;margin:3px 0;flex-shrink:0}
+.wb{width:3px;border-radius:2px;background:var(--c);opacity:.14;animation:wa 1.4s ease-in-out infinite}
+.wf.alive .wb{opacity:1}
+.wb:nth-child(1){height:4px}.wb:nth-child(2){height:9px;animation-delay:.1s}.wb:nth-child(3){height:15px;animation-delay:.2s}
+.wb:nth-child(4){height:20px;animation-delay:.3s}.wb:nth-child(5){height:16px;animation-delay:.38s}
+.wb:nth-child(6){height:22px;animation-delay:.3s}.wb:nth-child(7){height:17px;animation-delay:.22s}
+.wb:nth-child(8){height:12px;animation-delay:.14s}.wb:nth-child(9){height:7px;animation-delay:.06s}.wb:nth-child(10){height:3px}
+@keyframes wa{0%,100%{transform:scaleY(.28)}50%{transform:scaleY(1.7)}}
+
+/* STATUS BAR */
+.stbar{flex-shrink:0;height:22px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-family:'Share Tech Mono',monospace;font-size:.58rem}
+.stxt{color:var(--dim);letter-spacing:.1em}
+.stxt.spk{color:var(--cg)}.stxt.src{color:var(--cp)}
+.stats{display:flex;gap:12px;font-size:.55rem}
+
+/* MESSAGES */
+.msgs{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:9px;scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch}
+.msgs::-webkit-scrollbar{width:2px}.msgs::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.mrow{display:flex;gap:8px;align-items:flex-start;animation:ms .24s ease}
+@keyframes ms{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.mrow.u{flex-direction:row-reverse}
+.mav{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;border:1px solid}
+.mrow.ai .mav{background:linear-gradient(135deg,var(--cb),var(--c));border-color:rgba(0,212,255,.4);box-shadow:0 0 10px rgba(0,212,255,.2)}
+.mrow.u .mav{background:rgba(255,85,0,.13);border-color:rgba(255,85,0,.35)}
+body.light-mode .mrow.ai .mav{background:linear-gradient(135deg,#0055ff,#00d4ff)}
+body.light-mode .mrow.u .mav{background:rgba(255,85,0,.2)}
+.mc{max-width:78%}
+.mb{padding:10px 13px;border-radius:13px;font-size:.9rem;line-height:1.65;word-break:break-word}
+.mrow.ai .mb{background:rgba(0,85,255,.09);border:1px solid rgba(0,212,255,.13);border-top-left-radius:3px}
+.mrow.u .mb{background:rgba(255,85,0,.08);border:1px solid rgba(255,85,0,.16);border-top-right-radius:3px;text-align:right}
+body.light-mode .mrow.ai .mb{background:rgba(0,85,255,.15);border-color:rgba(0,85,255,.3)}
+body.light-mode .mrow.u .mb{background:rgba(255,85,0,.15);border-color:rgba(255,85,0,.3)}
+.mm{font-size:.57rem;color:var(--dim);margin-top:3px;font-family:'Share Tech Mono',monospace}
+
+/* INPUT ZONE */
+.iz{flex-shrink:0;padding:10px 12px 14px;border-top:1px solid var(--bdr);background:rgba(2,8,18,.98)}
+body.light-mode .iz{background:rgba(255,255,255,.95);border-top-color:rgba(0,0,0,.1)}
+
+/* CHIPS */
+.chips{display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:6px 13px;border-radius:20px;border:1px solid var(--bdr);background:transparent;
+  color:var(--dim);font-size:.68rem;cursor:pointer;font-family:'Rajdhani',sans-serif;
+  white-space:nowrap;flex-shrink:0;transition:all .15s}
+body.light-mode .chip{border-color:rgba(0,0,0,.2);color:var(--dim-light)}
+.chip:active{border-color:var(--c);color:var(--c);background:rgba(0,212,255,.07)}
+
+/* INPUT ROW */
+.irow{display:flex;gap:8px;align-items:flex-end}
+.iw{flex:1;display:flex;align-items:flex-end;gap:8px;background:rgba(4,17,32,.9);
+  border:1px solid var(--bdr);border-radius:14px;padding:10px 13px;transition:border-color .2s}
+body.light-mode .iw{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.15)}
+.iw:focus-within{border-color:var(--c);box-shadow:var(--glow)}
+textarea#inp{flex:1;background:transparent;border:none;outline:none;color:var(--txt);
+  font-family:'Rajdhani',sans-serif;font-size:1rem;resize:none;max-height:100px;line-height:1.4;
+  -webkit-user-select:text;user-select:text}
+body.light-mode textarea#inp{color:var(--txt-dark)}
+textarea#inp::placeholder{color:var(--dim)}
+
+.snd{width:52px;height:52px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--cb),var(--c));color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;
+  cursor:pointer;flex-shrink:0;box-shadow:0 0 14px rgba(0,212,255,.35);transition:all .2s}
+.snd:active{transform:scale(.91);box-shadow:var(--glow)}
+
+/* MODALS */
+.modal-ov{position:fixed;inset:0;z-index:200;background:rgba(2,8,18,.93);backdrop-filter:blur(10px);
+  display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+body.light-mode .modal-ov{background:rgba(255,255,255,.93)}
+.modal-ov.open{opacity:1;pointer-events:all}
+.modal-box{background:#061828;border:1px solid var(--c);border-radius:20px 20px 0 0;
+  padding:20px 16px 30px;width:100%;max-height:85vh;overflow-y:auto;
+  transform:translateY(40px);transition:transform .28s}
+body.light-mode .modal-box{background:#f5f5f5;border-color:rgba(0,0,0,.2)}
+.modal-ov.open .modal-box{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;border-radius:2px;background:var(--dim);margin:0 auto 16px}
+.mdt{font-family:'Orbitron',sans-serif;font-size:.75rem;letter-spacing:.2em;color:var(--c);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.mdc{cursor:pointer;color:var(--dim);font-size:1rem;padding:4px}
+
+/* DASHBOARD */
+.dashboard{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+.dash-card{background:rgba(0,85,255,.08);border:1px solid rgba(0,212,255,.15);border-radius:11px;padding:12px;text-align:center}
+body.light-mode .dash-card{background:rgba(0,85,255,.12);border-color:rgba(0,85,255,.3)}
+.dash-val{font-size:1.4rem;font-weight:900;color:var(--c);margin:6px 0}
+.dash-lbl{font-size:.65rem;color:var(--dim);letter-spacing:.1em}
+
+/* SETTINGS */
+.setting{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--bdr)}
+body.light-mode .setting{border-bottom-color:rgba(0,0,0,.1)}
+.sett-lbl{font-size:.8rem;color:var(--txt);margin-bottom:6px;display:flex;justify-content:space-between}
+.sett-val{font-size:.65rem;color:var(--dim)}
+.slider{width:100%;height:4px;border-radius:2px;background:rgba(0,212,255,.2);cursor:pointer;-webkit-appearance:none;appearance:none}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--c);cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.5)}
+.slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--c);border:none;cursor:pointer}
+.toggle-btn{display:inline-block;width:40px;height:20px;border-radius:10px;background:rgba(0,212,255,.3);position:relative;cursor:pointer;transition:all .2s}
+.toggle-btn.on{background:var(--cg)}
+.toggle-btn::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .2s}
+.toggle-btn.on::after{left:22px}
+
+/* TOAST */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:rgba(2,11,22,.98);border:1px solid var(--c);border-radius:10px;padding:8px 16px;
+  font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--txt);z-index:9999;
+  white-space:nowrap;box-shadow:var(--glow);opacity:0;transition:all .22s;pointer-events:none;
+  max-width:88vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+body.light-mode .toast{background:rgba(255,255,255,.98);border-color:rgba(0,0,0,.2);color:var(--txt-dark)}
+
+/* TAB CONTENT */
+.tab-content{display:none;flex:1;overflow-y:auto;padding:12px}
+.tab-content.active{display:flex;flex-direction:column}
+.tab-content.msgs-tab{padding:0}
+
+/* PROFILE */
+.profile-card{background:rgba(0,85,255,.08);border:1px solid rgba(0,212,255,.15);border-radius:14px;padding:16px;text-align:center;margin-bottom:16px}
+body.light-mode .profile-card{background:rgba(0,85,255,.12);border-color:rgba(0,85,255,.3)}
+.profile-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--cb),var(--c));display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 10px;border:2px solid var(--c)}
+.profile-name{font-size:1.1rem;font-weight:700;color:var(--txt);margin-bottom:4px}
+.profile-status{font-size:.7rem;color:var(--dim)}.profile-status.online{color:var(--cg)}
+
+/* TASK LIST */
+.task-item{background:rgba(0,85,255,.07);border:1px solid rgba(0,212,255,.1);border-radius:9px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+body.light-mode .task-item{background:rgba(0,85,255,.1);border-color:rgba(0,85,255,.2)}
+.task-check{width:18px;height:18px;border:2px solid var(--c);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem}
+.task-check.done{background:var(--cg);border-color:var(--cg);color:#000}
+.task-text{flex:1;font-size:.85rem}
+.task-text.done{color:var(--dim);text-decoration:line-through}
+.task-del{cursor:pointer;color:var(--co);font-size:.9rem}
+
+/* MUSIC PLAYER */
+.music-player{background:rgba(0,85,255,.08);border:1px solid rgba(0,212,255,.15);border-radius:11px;padding:14px;margin-bottom:14px}
+body.light-mode .music-player{background:rgba(0,85,255,.12);border-color:rgba(0,85,255,.3)}
+.music-title{font-size:.9rem;color:var(--txt);margin-bottom:8px}
+.music-artist{font-size:.7rem;color:var(--dim);margin-bottom:10px}
+.progress-bar{width:100%;height:4px;background:rgba(0,212,255,.2);border-radius:2px;margin-bottom:6px;cursor:pointer}
+.progress-fill{height:100%;background:var(--c);border-radius:2px;width:0%}
+.music-time{display:flex;justify-content:space-between;font-size:.6rem;color:var(--dim);margin-bottom:10px}
+.music-controls{display:flex;gap:10px;justify-content:center}
+.music-btn{width:40px;height:40px;border-radius:50%;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.3);color:var(--c);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .2s}
+.music-btn:active{transform:scale(.9)}
+
+/* WEATHER */
+.weather-card{background:rgba(0,85,255,.08);border:1px solid rgba(0,212,255,.15);border-radius:11px;padding:14px;text-align:center;margin-bottom:14px}
+body.light-mode .weather-card{background:rgba(0,85,255,.12);border-color:rgba(0,85,255,.3)}
+.weather-icon{font-size:3rem;margin:10px 0}
+.weather-temp{font-size:1.6rem;font-weight:700;color:var(--c);margin:8px 0}
+.weather-desc{font-size:.8rem;color:var(--dim)}
+
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+.cal-day{aspect-ratio:1;border:1px solid rgba(0,212,255,.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.75rem;cursor:pointer;background:rgba(0,212,255,.04)}
+body.light-mode .cal-day{background:rgba(0,85,255,.1);border-color:rgba(0,85,255,.2)}
+.cal-day.other{opacity:.4}
+.cal-day.today{background:var(--c);color:#000;font-weight:700}
+.cal-day.selected{background:var(--cg);color:#000}
+
+/* ANALYTICS */
+.chart-container{background:rgba(0,85,255,.08);border:1px solid rgba(0,212,255,.15);border-radius:11px;padding:12px;margin-bottom:12px;height:140px}
+body.light-mode .chart-container{background:rgba(0,85,255,.12);border-color:rgba(0,85,255,.3)}
+.chart-bar{display:flex;align-items:flex-end;justify-content:space-around;height:100%;gap:4px}
+.bar{flex:1;background:linear-gradient(180deg,var(--c),var(--cb));border-radius:4px 4px 0 0;min-height:10px;position:relative}
+.bar::after{content:attr(data-val);position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:.6rem;color:var(--dim)}
+
+/* NEW ADVANCED FEATURES */
+.code-block{background:rgba(0,85,255,.08);border:1px solid rgba(0,212,255,.15);border-radius:8px;padding:12px;margin:8px 0;font-family:'Share Tech Mono',monospace;font-size:.75rem;overflow-x:auto;color:var(--cg)}
+.neural-net{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.neuron{width:100%;aspect-ratio:1;border-radius:50%;border:2px solid var(--c);display:flex;align-items:center;justify-content:center;font-size:.7rem;background:rgba(0,212,255,.08);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 8px rgba(0,212,255,.3)}50%{box-shadow:0 0 20px rgba(0,212,255,.8)}}
+.skill-bar{margin:10px 0}
+.skill-name{font-size:.8rem;margin-bottom:4px;display:flex;justify-content:space-between}
+.skill-fill{height:6px;background:rgba(0,212,255,.2);border-radius:3px;overflow:hidden}
+.skill-progress{height:100%;background:linear-gradient(90deg,var(--cg),var(--c));border-radius:3px;transition:width .3s}
+.ai-response{background:linear-gradient(135deg,rgba(0,85,255,.1),rgba(0,212,255,.05));border-left:3px solid var(--cg);padding:10px;border-radius:6px;margin:8px 0;font-size:.85rem}
+.integration-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+.integration-item{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.15);border-radius:8px;padding:12px;text-align:center;font-size:.7rem;cursor:pointer;transition:all .2s}
+.integration-item:hover{background:rgba(0,212,255,.15);border-color:var(--c)}
+</style>
+</head>
+<body>
+<canvas id="bgc"></canvas><div class="bgg"></div>
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="lring">
+      <svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="20" stroke="rgba(0,212,255,0.5)" stroke-width="1" stroke-dasharray="6 3"/></svg>
+      <svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="14" stroke="rgba(0,85,255,0.5)" stroke-width="1" stroke-dasharray="4 4"/></svg>
+      <div class="linner">MJ</div>
+    </div>
+    <div><div class="lname">MJ</div><div class="ltag">ADVANCED AI PLATFORM v2.0</div></div>
+  </div>
+  <div class="hbtns">
+    <div class="hbtn act" id="ttsBtn" onclick="toggleTTS()"><span class="dot"></span>LIVE</div>
+    <div class="hbtn" onclick="toggleTheme()">🌙</div>
+    <div class="hbtn" id="moodPill">😐</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TAB NAVIGATION -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('chat')">💬 Chat</button>
+    <button class="tab-btn" onclick="switchTab('profile')">👤 Profile</button>
+    <button class="tab-btn" onclick="switchTab('ml')">🧠 ML Engine</button>
+    <button class="tab-btn" onclick="switchTab('code')">💻 Code</button>
+    <button class="tab-btn" onclick="switchTab('weather')">🌤️ Weather</button>
+    <button class="tab-btn" onclick="switchTab('music')">🎵 Music</button>
+    <button class="tab-btn" onclick="switchTab('tasks')">📋 Tasks</button>
+    <button class="tab-btn" onclick="switchTab('calendar')">📅 Calendar</button>
+    <button class="tab-btn" onclick="switchTab('analytics')">📊 Analytics</button>
+    <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+  </div>
+
+  <!-- CHAT TAB -->
+  <div id="chat" class="tab-content msgs-tab active">
+    <div class="orb-sec">
+      <div class="ow" id="orbWrap">
+        <div class="or or1"></div><div class="or or2"></div><div class="or or3"></div>
+        <div class="oc" id="orbCore"></div>
+      </div>
+      <div class="ol lit" id="orbLbl">MJ IS READY</div>
+    </div>
+    <div class="wf" id="wf">
+      <div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div>
+      <div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div>
+    </div>
+    <div class="stbar">
+      <span class="stxt" id="stxt"></span>
+      <div class="stats">
+        <span>📊 <span id="msgCount">0</span> msgs</span>
+        <span>⚡ <span id="tokenCount">0</span> tokens</span>
+        <span>🧠 <span id="mlScore">0</span>% ML</span>
+      </div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+
+    <div class="iz">
+      <div class="chips" id="chips">
+        <button class="chip" onclick="switchAIMode('assistant')">🤖 Assistant</button>
+        <button class="chip" onclick="switchAIMode('creative')">✨ Creative</button>
+        <button class="chip" onclick="switchAIMode('gaming')">🎮 Gaming</button>
+        <button class="chip" onclick="switchAIMode('coding')">💻 Coding</button>
+        <button class="chip" onclick="doSearch('latest news')">📰 News</button>
+        <button class="chip" onclick="doSearch('weather')">🌤️ Weather</button>
+        <button class="chip" onclick="doSearch('sports')">⚽ Sports</button>
+      </div>
+      <div class="irow">
+        <div class="iw">
+          <textarea id="inp" placeholder="Type or use 🎙️ keyboard mic…" rows="1"
+            onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        </div>
+        <div class="snd" onclick="sendMsg()">➤</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE TAB -->
+  <div id="profile" class="tab-content">
+    <div class="profile-card">
+      <div class="profile-avatar">👤</div>
+      <div class="profile-name" id="userName">User</div>
+      <div class="profile-status online" id="userStatus">Online</div>
+    </div>
+
+    <div class="dashboard">
+      <div class="dash-card">
+        <div class="dash-lbl">TOTAL CHATS</div>
+        <div class="dash-val" id="totalChats">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-lbl">MESSAGES SENT</div>
+        <div class="dash-val" id="totalMessages">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-lbl">AI MODE</div>
+        <div class="dash-val" id="currentMode">ASSISTANT</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-lbl">LANGUAGE</div>
+        <div class="dash-val" id="currentLang">ENGLISH</div>
+      </div>
+    </div>
+
+    <div>
+      <button class="chip" onclick="clearHistory()" style="width:100%;margin-bottom:10px">Clear Chat History</button>
+      <button class="chip" onclick="exportData()" style="width:100%;margin-bottom:10px">Export Data</button>
+      <button class="chip" onclick="showUserStats()" style="width:100%">Advanced Stats</button>
+    </div>
+  </div>
+
+  <!-- ML ENGINE TAB (NEW) -->
+  <div id="ml" class="tab-content">
+    <div style="font-size:.9rem;color:var(--txt);margin-bottom:12px;font-weight:700">Neural Network Status</div>
+    <div class="neural-net" id="neuralNet"></div>
+
+    <div style="font-size:.9rem;color:var(--txt);margin:16px 0 12px;font-weight:700">ML Skills & Capabilities</div>
+    
+    <div class="skill-bar">
+      <div class="skill-name"><span>🎯 Natural Language Processing</span><span id="nlp-val">92%</span></div>
+      <div class="skill-fill"><div class="skill-progress" style="width:92%"></div></div>
+    </div>
+    <div class="skill-bar">
+      <div class="skill-name"><span>🖼️ Computer Vision</span><span id="cv-val">87%</span></div>
+      <div class="skill-fill"><div class="skill-progress" style="width:87%"></div></div>
+    </div>
+    <div class="skill-bar">
+      <div class="skill-name"><span>📊 Data Analysis</span><span id="da-val">95%</span></div>
+      <div class="skill-fill"><div class="skill-progress" style="width:95%"></div></div>
+    </div>
+    <div class="skill-bar">
+      <div class="skill-name"><span>🔮 Predictive Analytics</span><span id="pa-val">88%</span></div>
+      <div class="skill-fill"><div class="skill-progress" style="width:88%"></div></div>
+    </div>
+
+    <div style="font-size:.9rem;color:var(--txt);margin:16px 0 12px;font-weight:700">Model Performance</div>
+    <div class="ai-response">
+      📈 Accuracy: 98.7% | ⚡ Inference Speed: 0.45ms | 💾 Model Size: 2.3GB
+    </div>
+
+    <div style="font-size:.9rem;color:var(--txt);margin:16px 0 12px;font-weight:700">Integrations</div>
+    <div class="integration-grid">
+      <div class="integration-item" onclick="loadIntegration('openai')">🤖 OpenAI</div>
+      <div class="integration-item" onclick="loadIntegration('google')">🔵 Google AI</div>
+      <div class="integration-item" onclick="loadIntegration('huggingface')">🤗 HuggingFace</div>
+      <div class="integration-item" onclick="loadIntegration('aws')">☁️ AWS</div>
+      <div class="integration-item" onclick="loadIntegration('azure')">Ⓜ️ Azure</div>
+      <div class="integration-item" onclick="loadIntegration('tensorflow')">🧠 TensorFlow</div>
+    </div>
+  </div>
+
+  <!-- CODE TAB (NEW) -->
+  <div id="code" class="tab-content">
+    <div style="font-size:.9rem;color:var(--txt);margin-bottom:12px;font-weight:700">Code Generation & Execution</div>
+    
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="chip" onclick="generateCode('python')">🐍 Python</button>
+      <button class="chip" onclick="generateCode('javascript')">📜 JavaScript</button>
+      <button class="chip" onclick="generateCode('java')">☕ Java</button>
+      <button class="chip" onclick="generateCode('sql')">📊 SQL</button>
+      <button class="chip" onclick="generateCode('html')">🌐 HTML</button>
+    </div>
+
+    <div style="font-size:.8rem;color:var(--txt);margin-bottom:8px">Generated Code:</div>
+    <div class="code-block" id="codeBlock">// Select a language to generate code</div>
+
+    <div style="margin-top:14px">
+      <button class="chip" onclick="executeCode()" style="width:100%;margin-bottom:10px">▶️ Execute</button>
+      <button class="chip" onclick="copyCode()" style="width:100%">📋 Copy</button>
+    </div>
+  </div>
+
+  <!-- WEATHER TAB -->
+  <div id="weather" class="tab-content">
+    <div class="weather-card">
+      <div style="font-size:.8rem;color:var(--dim);margin-bottom:8px">Current Weather</div>
+      <div class="weather-icon" id="weatherIcon">🌤️</div>
+      <div class="weather-temp" id="weatherTemp">28°C</div>
+      <div class="weather-desc" id="weatherDesc">Partly Cloudy</div>
+      <div style="font-size:.7rem;color:var(--dim);margin-top:8px">
+        💨 <span id="windSpeed">12</span> km/h | 💧 <span id="humidity">65</span>%
+      </div>
+    </div>
+
+    <div style="font-size:.8rem;color:var(--txt);margin-bottom:8px;margin-top:12px">5-Day Forecast</div>
+    <div class="dashboard">
+      <div class="dash-card" style="padding:8px">
+        <div style="font-size:.7rem;color:var(--dim);margin-bottom:4px">Tomorrow</div>
+        <div style="font-size:1.2rem;margin:4px 0">☁️</div>
+        <div style="font-size:.8rem;color:var(--c)">26°C</div>
+      </div>
+      <div class="dash-card" style="padding:8px">
+        <div style="font-size:.7rem;color:var(--dim);margin-bottom:4px">+2 Days</div>
+        <div style="font-size:1.2rem;margin:4px 0">🌧️</div>
+        <div style="font-size:.8rem;color:var(--c)">22°C</div>
+      </div>
+      <div class="dash-card" style="padding:8px">
+        <div style="font-size:.7rem;color:var(--dim);margin-bottom:4px">+3 Days</div>
+        <div style="font-size:1.2rem;margin:4px 0">⛅</div>
+        <div style="font-size:.8rem;color:var(--c)">25°C</div>
+      </div>
+      <div class="dash-card" style="padding:8px">
+        <div style="font-size:.7rem;color:var(--dim);margin-bottom:4px">+4 Days</div>
+        <div style="font-size:1.2rem;margin:4px 0">☀️</div>
+        <div style="font-size:.8rem;color:var(--c)">29°C</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MUSIC TAB -->
+  <div id="music" class="tab-content">
+    <div class="music-player">
+      <div class="music-title" id="musicTitle">Currently Playing</div>
+      <div class="music-artist" id="musicArtist">MJ AI Assistant</div>
+      <div class="progress-bar" onclick="seekMusic(event)">
+        <div class="progress-fill" id="musicProgress"></div>
+      </div>
+      <div class="music-time">
+        <span id="currentTime">0:00</span>
+        <span id="duration">3:45</span>
+      </div>
+      <div class="music-controls">
+        <div class="music-btn" onclick="prevMusic()">⏮️</div>
+        <div class="music-btn" onclick="toggleMusic()" id="playBtn">▶️</div>
+        <div class="music-btn" onclick="nextMusic()">⏭️</div>
+        <div class="music-btn" onclick="shuffleMusic()">🔀</div>
+        <div class="music-btn" onclick="repeatMusic()">🔁</div>
+      </div>
+    </div>
+
+    <div style="font-size:.8rem;color:var(--txt);margin:14px 0 8px">Playlist (5 tracks)</div>
+    <div class="dashboard" style="grid-template-columns:1fr">
+      <div class="dash-card" style="padding:8px;text-align:left;cursor:pointer" onclick="playTrack('Synthetic Dreams')">
+        <div style="font-size:.85rem;color:var(--c)">🎵 Synthetic Dreams</div>
+        <div style="font-size:.7rem;color:var(--dim);margin-top:4px">3:45 • AI Generated</div>
+      </div>
+      <div class="dash-card" style="padding:8px;text-align:left;cursor:pointer" onclick="playTrack('Digital Dawn')">
+        <div style="font-size:.85rem;color:var(--c)">🎵 Digital Dawn</div>
+        <div style="font-size:.7rem;color:var(--dim);margin-top:4px">4:12 • AI Generated</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASKS TAB -->
+  <div id="tasks" class="tab-content">
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <input type="text" id="taskInput" placeholder="Add new task…" style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--bdr);background:rgba(4,17,32,.9);color:var(--txt);font-size:.9rem">
+      <button class="snd" onclick="addTask()" style="width:auto;padding:0 16px">+</button>
+    </div>
+
+    <div style="font-size:.8rem;color:var(--dim);margin-bottom:8px">Active Tasks</div>
+    <div id="taskList"></div>
+
+    <div style="font-size:.8rem;color:var(--dim);margin:14px 0 8px">Completed</div>
+    <div id="completedList"></div>
+  </div>
+
+  <!-- CALENDAR TAB -->
+  <div id="calendar" class="tab-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <button class="chip" onclick="prevMonth()">← Prev</button>
+      <span id="monthYear" style="font-size:.9rem;font-weight:700"></span>
+      <button class="chip" onclick="nextMonth()">Next →</button>
+    </div>
+
+    <div class="cal-grid" id="calendar-grid"></div>
+
+    <div style="margin-top:16px;padding:12px;background:rgba(0,85,255,.08);border-radius:11px;border:1px solid rgba(0,212,255,.15)">
+      <div style="font-size:.8rem;color:var(--dim);margin-bottom:8px">Selected Date Events</div>
+      <div id="eventsList" style="font-size:.8rem;color:var(--txt)">No events</div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS TAB -->
+  <div id="analytics" class="tab-content">
+    <div style="font-size:.9rem;color:var(--txt);margin-bottom:8px;font-weight:700">Messages This Week</div>
+    <div class="chart-container">
+      <div class="chart-bar">
+        <div class="bar" data-val="12"></div>
+        <div class="bar" data-val="18"></div>
+        <div class="bar" data-val="15"></div>
+        <div class="bar" data-val="22"></div>
+        <div class="bar" data-val="19"></div>
+        <div class="bar" data-val="25"></div>
+        <div class="bar" data-val="20"></div>
+      </div>
+    </div>
+
+    <div class="dashboard">
+      <div class="dash-card">
+        <div class="dash-lbl">AVG RESPONSE</div>
+        <div class="dash-val">0.8s</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-lbl">ACCURACY</div>
+        <div class="dash-val">98%</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-lbl">UPTIME</div>
+        <div class="dash-val">99.9%</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-lbl">MOOD SCORE</div>
+        <div class="dash-val" id="moodScore">8.5</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px">
+      <div style="font-size:.9rem;color:var(--txt);margin-bottom:8px;font-weight:700">Top Interactions</div>
+      <div class="task-item">
+        <div style="flex:1;font-size:.85rem">Chat-based queries</div>
+        <div style="color:var(--c);font-size:.85rem;font-weight:700">68%</div>
+      </div>
+      <div class="task-item">
+        <div style="flex:1;font-size:.85rem">Search requests</div>
+        <div style="color:var(--c);font-size:.85rem;font-weight:700">18%</div>
+      </div>
+      <div class="task-item">
+        <div style="flex:1;font-size:.85rem">Smart home control</div>
+        <div style="color:var(--c);font-size:.85rem;font-weight:700">14%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div id="settings" class="tab-content">
+    <div style="font-size:.9rem;color:var(--txt);margin-bottom:14px;font-weight:700">Voice & Audio</div>
+    <div class="setting">
+      <div class="sett-lbl">
+        Text-to-Speech
+        <div class="toggle-btn on" id="ttsToggle" onclick="toggleTTS()"></div>
+      </div>
+      <div class="sett-val">Enabled</div>
+    </div>
+    <div class="setting">
+      <div class="sett-lbl">
+        <span>Voice Speed</span>
+        <span class="sett-val" id="speedVal">1.0x</span>
+      </div>
+      <input type="range" min="0.5" max="2" step="0.1" value="1" class="slider" oninput="updateSpeed(this.value)">
+    </div>
+    <div class="setting">
+      <div class="sett-lbl">
+        <span>Volume</span>
+        <span class="sett-val" id="volVal">100%</span>
+      </div>
+      <input type="range" min="0" max="100" value="100" class="slider" oninput="updateVolume(this.value)">
+    </div>
+
+    <div style="font-size:.9rem;color:var(--txt);margin:20px 0 14px;font-weight:700">Appearance</div>
+    <div class="setting">
+      <div class="sett-lbl">
+        Dark Mode
+        <div class="toggle-btn on" id="darkToggle" onclick="toggleTheme()"></div>
+      </div>
+      <div class="sett-val">Active</div>
+    </div>
+
+    <div style="font-size:.9rem;color:var(--txt);margin:20px 0 14px;font-weight:700">Language & Region</div>
+    <div class="setting">
+      <div class="sett-lbl">Language</div>
+      <select id="langSelect" onchange="changeLanguage(this.value)" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bdr);background:rgba(4,17,32,.9);color:var(--txt);font-size:.85rem">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="ja">日本語</option>
+        <option value="zh">中文</option>
+        <option value="hi">हिन्दी</option>
+      </select>
+    </div>
+
+    <div style="font-size:.9rem;color:var(--txt);margin:20px 0 14px;font-weight:700">AI Behavior</div>
+    <div class="setting">
+      <div class="sett-lbl">
+        <span>Response Length</span>
+        <span class="sett-val" id="lenVal">Medium</span>
+      </div>
+      <input type="range" min="1" max="3" value="2" class="slider" oninput="updateLength(this.value)">
+    </div>
+    <div class="setting">
+      <div class="sett-lbl">
+        <span>Creativity Level</span>
+        <span class="sett-val" id="creativeVal">5</span>
+      </div>
+      <input type="range" min="1" max="10" value="5" class="slider" oninput="updateCreativity(this.value)">
+    </div>
+
+    <div style="font-size:.9rem;color:var(--txt);margin:20px 0 14px;font-weight:700">Advanced ML Settings</div>
+    <div class="setting">
+      <div class="sett-lbl">
+        <span>Model Precision</span>
+        <span class="sett-val" id="precisionVal">High</span>
+      </div>
+      <input type="range" min="1" max="3" value="2" class="slider" oninput="updatePrecision(this.value)">
+    </div>
+    <div class="setting">
+      <div class="sett-lbl">
+        <span>Context Window</span>
+        <span class="sett-val" id="contextVal">8192</span>
+      </div>
+      <input type="range" min="2048" max="32768" step="2048" value="8192" class="slider" oninput="updateContext(this.value)">
+    </div>
+
+    <button class="chip" onclick="resetSettings()" style="width:100%;margin-top:20px">Reset to Defaults</button>
+  </div>
+</div>
+
+<script>
+// ── BACKGROUND ──
+(function(){
+  const c=document.getElementById('bgc'),ctx=c.getContext('2d');
+  let W,H,dots=[];
+  function init(){W=c.width=innerWidth;H=c.height=innerHeight;dots=[];const n=Math.floor(W*H/14000);for(let i=0;i<n;i++)dots.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*1.1+.3,a:Math.random()*.4+.1});}
+  function draw(){ctx.clearRect(0,0,W,H);dots.forEach(d=>{d.x+=d.vx;d.y+=d.vy;if(d.x<0)d.x=W;if(d.x>W)d.x=0;if(d.y<0)d.y=H;if(d.y>H)d.y=0;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);ctx.fillStyle=`rgba(0,212,255,${d.a})`;ctx.fill();});for(let i=0;i<dots.length;i++)for(let j=i+1;j<dots.length;j++){const dx=dots[i].x-dots[j].x,dy=dots[i].y-dots[j].y,d2=dx*dx+dy*dy;if(d2<7000){ctx.beginPath();ctx.moveTo(dots[i].x,dots[i].y);ctx.lineTo(dots[j].x,dots[j].y);ctx.strokeStyle=`rgba(0,212,255,${.05*(1-Math.sqrt(d2)/84)})`;ctx.lineWidth=.5;ctx.stroke();}}requestAnimationFrame(draw);}
+  window.addEventListener('resize',init);init();draw();
+})();
+
+// ── STATE ──
+const S={tts:true,darkMode:true,msgCount:0,tokens:0,mlScore:0,aiMode:'assistant',language:'en',musicPlaying:false,currentDate:new Date(),tasks:[],settings:{speed:1,volume:100,length:'medium',creativity:5,precision:'high',contextWindow:8192},codeBlock:'',mlModels:[]};
+const moods=['😐','😊','🤔','😎','🚀','💡','🎯','✨'];
+const aiModes={assistant:'I am a helpful assistant.',creative:'I am a creative storyteller.',gaming:'I am a gaming enthusiast.',coding:'I am an expert programmer.'};
+const codeTemplates={python:'def hello_world():\n  print("Hello, World!")\n  return "Success"',javascript:'function helloWorld() {\n  console.log("Hello, World!");\n  return "Success";\n}',java:'public class HelloWorld {\n  public static void main(String[] args) {\n    System.out.println("Hello, World!");\n  }\n}',sql:'SELECT * FROM users WHERE active = 1 LIMIT 10;',html:'<!DOCTYPE html>\n<html>\n<head><title>Hello</title></head>\n<body><h1>Hello, World!</h1></body>\n</html>'};
+
+// ── TAB SYSTEM ──
+function switchTab(tab){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(tab)?.classList.add('active');document.querySelector(`[onclick*="${tab}"]`)?.classList.add('active');if(tab==='calendar')renderCalendar();if(tab==='analytics')updateAnalytics();if(tab==='ml')initNeuralNet();}
+
+// ── THEME ──
+function toggleTheme(){document.body.classList.toggle('light-mode');S.darkMode=!S.darkMode;const toggle=document.getElementById('darkToggle');if(toggle)toggle.classList.toggle('on');const btn=document.querySelector('[onclick="toggleTheme()"]');if(btn)btn.textContent=S.darkMode?'🌙':'☀️';}
+
+// ── CHAT FUNCTIONS ──
+function formatTime(){const now=new Date();return String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');}
+function addMsg(txt,isUser=false){const m=document.getElementById('msgs');const row=document.createElement('div');row.className='mrow '+(isUser?'u':'ai');const av=document.createElement('div');av.className='mav';av.textContent=isUser?'👤':'🤖';const mc=document.createElement('div');mc.className='mc';const mb=document.createElement('div');mb.className='mb';mb.textContent=txt;const mm=document.createElement('div');mm.className='mm';mm.textContent=formatTime();mc.appendChild(mb);mc.appendChild(mm);row.appendChild(av);row.appendChild(mc);m.appendChild(row);m.scrollTop=m.scrollHeight;}
+function sendMsg(){const inp=document.getElementById('inp');const txt=inp.value.trim();if(!txt)return;addMsg(txt,true);inp.value='';autoResize(inp);const orb=document.getElementById('orbCore');if(orb){orb.classList.add('spk');setTimeout(()=>orb.classList.remove('spk'),1200);}updateMood();S.msgCount++;document.getElementById('msgCount').textContent=S.msgCount;document.getElementById('totalMessages').textContent=S.msgCount;S.tokens+=Math.floor(txt.length*1.3);S.mlScore=Math.min(100,S.mlScore+Math.floor(Math.random()*15));document.getElementById('tokenCount').textContent=Math.floor(S.tokens);document.getElementById('mlScore').textContent=S.mlScore;setTimeout(()=>{const responses=['🎯 Understood!','⚡ Processing...','✨ Got it!','🚀 Working on it...','💡 One moment...','🧠 Analyzing...'];addMsg(responses[Math.floor(Math.random()*responses.length)],false);},800);}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function autoResize(e){e.style.height='auto';e.style.height=Math.min(e.scrollHeight,100)+'px';}
+function switchAIMode(mode){S.aiMode=mode;document.getElementById('currentMode').textContent=mode.toUpperCase();toast(`🤖 Switched to ${mode} mode`);}
+function doSearch(term){addMsg(`🔍 Searching: ${term}`,true);setTimeout(()=>{addMsg(`📊 Found comprehensive information about ${term}. Analyzing patterns...`,false);S.tokens+=50;S.mlScore=Math.min(100,S.mlScore+10);document.getElementById('mlScore').textContent=S.mlScore;},1000);}
+function toggleTTS(){S.tts=!S.tts;document.getElementById('ttsBtn').classList.toggle('act');const toggle=document.getElementById('ttsToggle');if(toggle)toggle.classList.toggle('on');toast(S.tts?'🔊 TTS ON':'🔇 TTS OFF');}
+function updateMood(){const pill=document.getElementById('moodPill');pill.textContent=moods[Math.floor(Math.random()*moods.length)];}
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2500);}
+
+// ── ML ENGINE ──
+function initNeuralNet(){const net=document.getElementById('neuralNet');net.innerHTML='';for(let i=0;i<9;i++){const n=document.createElement('div');n.className='neuron';n.textContent=Math.floor(Math.random()*100);net.appendChild(n);}}
+function loadIntegration(name){toast(`🔗 Loading ${name.toUpperCase()} integration...`);addMsg(`📚 ${name} integration loaded`,false);}
+function showUserStats(){toast('📊 Generating advanced user statistics...');}
+
+// ── CODE GENERATION ──
+function generateCode(lang){S.codeBlock=codeTemplates[lang]||'// No template available';document.getElementById('codeBlock').textContent=S.codeBlock;toast(`✨ Generated ${lang.toUpperCase()} code`);}
+function executeCode(){toast('▶️ Executing code...');addMsg('Code executed successfully!',false);}
+function copyCode(){navigator.clipboard.writeText(S.codeBlock);toast('📋 Code copied to clipboard');}
+
+// ── MUSIC PLAYER ──
+function toggleMusic(){const btn=document.getElementById('playBtn');S.musicPlaying=!S.musicPlaying;btn.textContent=S.musicPlaying?'⏸️':'▶️';toast(S.musicPlaying?'▶️ Playing':'⏸️ Paused');}
+function prevMusic(){toast('⏮️ Previous track');document.getElementById('musicTitle').textContent='Synthetic Dreams';}
+function nextMusic(){toast('⏭️ Next track');document.getElementById('musicTitle').textContent='Digital Dawn';}
+function shuffleMusic(){toast('🔀 Shuffle enabled');}
+function repeatMusic(){toast('🔁 Repeat enabled');}
+function playTrack(name){document.getElementById('musicTitle').textContent=name;S.musicPlaying=true;document.getElementById('playBtn').textContent='⏸️';toast(`Now playing: ${name}`);}
+function seekMusic(e){const rect=e.currentTarget.getBoundingClientRect();const percent=(e.clientX-rect.left)/rect.width*100;document.getElementById('musicProgress').style.width=percent+'%';}
+
+// ── TASKS ──
+function addTask(){const inp=document.getElementById('taskInput');const txt=inp.value.trim();if(!txt)return;S.tasks.push({text:txt,done:false});inp.value='';renderTasks();toast('✅ Task added');}
+function toggleTask(idx){S.tasks[idx].done=!S.tasks[idx].done;renderTasks();}
+function delTask(idx){S.tasks.splice(idx,1);renderTasks();}
+function renderTasks(){const list=document.getElementById('taskList');const comp=document.getElementById('completedList');list.innerHTML='';comp.innerHTML='';S.tasks.forEach((t,i)=>{const div=document.createElement('div');div.className='task-item';div.innerHTML=`<div class="task-check ${t.done?'done':''}"></div><div class="task-text ${t.done?'done':''}">${t.text}</div><div class="task-del" onclick="delTask(${i})">🗑️</div>`;if(t.done)comp.appendChild(div);else list.appendChild(div);div.querySelector('.task-check').onclick=()=>toggleTask(i);});if(!list.innerHTML)list.innerHTML='<div style="color:var(--dim);font-size:.8rem">No active tasks</div>';}
+
+// ── CALENDAR ──
+function renderCalendar(){const year=S.currentDate.getFullYear();const month=S.currentDate.getMonth();const first=new Date(year,month,1);const last=new Date(year,month+1,0);const days=[];const prevLast=new Date(year,month,0).getDate();for(let i=first.getDay()-1;i>=0;i--)days.push({date:prevLast-i,other:true});for(let i=1;i<=last.getDate();i++)days.push({date:i,other:false});const remaining=42-days.length;for(let i=1;i<=remaining;i++)days.push({date:i,other:true});const grid=document.getElementById('calendar-grid');grid.innerHTML='';const names=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];names.forEach(n=>{const h=document.createElement('div');h.textContent=n;h.style.textAlign='center';h.style.fontSize='.7rem';h.style.color='var(--dim)';grid.appendChild(h);});days.forEach(d=>{const div=document.createElement('div');div.className='cal-day'+(d.other?' other':'')+(d.date===new Date().getDate()&&!d.other?' today':'');div.textContent=d.date;div.onclick=()=>{document.querySelectorAll('.cal-day.selected').forEach(e=>e.classList.remove('selected'));div.classList.add('selected');};grid.appendChild(div);});document.getElementById('monthYear').textContent=first.toLocaleDateString('en-US',{month:'long',year:'numeric'});}
+function prevMonth(){S.currentDate.setMonth(S.currentDate.getMonth()-1);renderCalendar();}
+function nextMonth(){S.currentDate.setMonth(S.currentDate.getMonth()+1);renderCalendar();}
+
+// ── ANALYTICS ──
+function updateAnalytics(){const score=(S.msgCount*S.tokens)/(Math.max(1,S.tokens));document.getElementById('moodScore').textContent=(Math.min(10,score/1000+5)).toFixed(1);}
+
+// ── SETTINGS ──
+function updateSpeed(val){S.settings.speed=val;document.getElementById('speedVal').textContent=parseFloat(val).toFixed(1)+'x';}
+function updateVolume(val){S.settings.volume=val;document.getElementById('volVal').textContent=val+'%';}
+function updateLength(val){const lens=['Short','Medium','Long'];S.settings.length=lens[val-1];document.getElementById('lenVal').textContent=lens[val-1];}
+function updateCreativity(val){S.settings.creativity=val;document.getElementById('creativeVal').textContent=val;}
+function updatePrecision(val){const prec=['Low','Medium','High'];S.settings.precision=prec[val-1];document.getElementById('precisionVal').textContent=prec[val-1];}
+function updateContext(val){S.settings.contextWindow=val;document.getElementById('contextVal').textContent=val;}
+function changeLanguage(lang){S.language=lang;document.getElementById('currentLang').textContent=lang.toUpperCase();toast(`🌍 Language changed to ${lang}`);}
+function resetSettings(){if(confirm('Reset all settings?')){S.settings={speed:1,volume:100,length:'medium',creativity:5,precision:'high',contextWindow:8192};document.getElementById('speedVal').textContent='1.0x';document.getElementById('volVal').textContent='100%';document.getElementById('lenVal').textContent='Medium';document.getElementById('creativeVal').textContent='5';document.getElementById('precisionVal').textContent='High';document.getElementById('contextVal').textContent='8192';toast('⚙️ Settings reset');}}
+
+// ── DATA MANAGEMENT ──
+function clearHistory(){if(confirm('Clear all messages?')){document.getElementById('msgs').innerHTML='';S.msgCount=0;S.mlScore=0;document.getElementById('msgCount').textContent='0';document.getElementById('mlScore').textContent='0';toast('🗑️ History cleared');}}
+function exportData(){const data={messages:S.msgCount,tokens:S.tokens,mlScore:S.mlScore,tasks:S.tasks,settings:S.settings};const json=JSON.stringify(data,null,2);const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='mj-data.json';a.click();toast('📥 Data exported');}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded',()=>{renderTasks();renderCalendar();updateMood();document.getElementById('userName').textContent='User '+Math.floor(Math.random()*10000);document.getElementById('totalChats').textContent='0';});
+</script>
+</body>
+</html>
