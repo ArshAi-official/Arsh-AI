@@ -52,6 +52,19 @@ body.light-mode .hbtn.act{background:rgba(0,255,170,.15)}
   animation:blink 2s ease infinite;display:inline-block;margin-right:3px;vertical-align:middle}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 
+/* VOICE BUTTON */
+.voice-btn{position:fixed;bottom:30px;right:30px;z-index:100;width:70px;height:70px;border-radius:50%;
+  background:linear-gradient(135deg,var(--cg),var(--c));border:2px solid var(--cg);
+  display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;
+  box-shadow:0 0 25px rgba(0,255,170,.4);transition:all .2s;color:#000;font-weight:900}
+.voice-btn:hover{transform:scale(1.1);box-shadow:0 0 40px rgba(0,255,170,.8)}
+.voice-btn.listening{animation:listening .5s ease-in-out infinite;background:linear-gradient(135deg,var(--co),var(--cp))}
+@keyframes listening{0%{box-shadow:0 0 25px rgba(255,85,0,.4)}50%{box-shadow:0 0 50px rgba(255,85,0,.8)}100%{box-shadow:0 0 25px rgba(255,85,0,.4)}}
+.voice-status{position:fixed;bottom:120px;right:30px;z-index:99;background:rgba(2,11,22,.98);border:1px solid var(--c);
+  border-radius:10px;padding:12px 16px;font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--cg);
+  box-shadow:var(--glow);opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap}
+.voice-status.show{opacity:1;pointer-events:all}
+
 /* MAIN */
 .main{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;overflow:hidden}
 
@@ -159,19 +172,6 @@ body.light-mode .dash-card{background:rgba(0,85,255,.12);border-color:rgba(0,85,
 .dash-val{font-size:1.4rem;font-weight:900;color:var(--c);margin:6px 0}
 .dash-lbl{font-size:.65rem;color:var(--dim);letter-spacing:.1em}
 
-/* SETTINGS */
-.setting{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--bdr)}
-body.light-mode .setting{border-bottom-color:rgba(0,0,0,.1)}
-.sett-lbl{font-size:.8rem;color:var(--txt);margin-bottom:6px;display:flex;justify-content:space-between}
-.sett-val{font-size:.65rem;color:var(--dim)}
-.slider{width:100%;height:4px;border-radius:2px;background:rgba(0,212,255,.2);cursor:pointer;-webkit-appearance:none;appearance:none}
-.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--c);cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.5)}
-.slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--c);border:none;cursor:pointer}
-.toggle-btn{display:inline-block;width:40px;height:20px;border-radius:10px;background:rgba(0,212,255,.3);position:relative;cursor:pointer;transition:all .2s}
-.toggle-btn.on{background:var(--cg)}
-.toggle-btn::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .2s}
-.toggle-btn.on::after{left:22px}
-
 /* TOAST */
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(10px);
   background:rgba(2,11,22,.98);border:1px solid var(--c);border-radius:10px;padding:8px 16px;
@@ -204,6 +204,8 @@ body.light-mode .news-item{background:rgba(0,85,255,.12);border-color:rgba(0,85,
 <body>
 <canvas id="bgc"></canvas><div class="bgg"></div>
 <div class="toast" id="toast"></div>
+<div class="voice-status" id="voiceStatus">🎤 Voice is inactive</div>
+<div class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🎤</div>
 
 <!-- HEADER -->
 <header>
@@ -241,14 +243,14 @@ body.light-mode .news-item{background:rgba(0,85,255,.12);border-color:rgba(0,85,
         <div class="or or1"></div><div class="or or2"></div><div class="or or3"></div>
         <div class="oc" id="orbCore"></div>
       </div>
-      <div class="ol lit" id="orbLbl">MJ IS READY</div>
+      <div class="ol lit" id="orbLbl">MJ IS READY - Say "MJ" to activate voice</div>
     </div>
     <div class="wf" id="wf">
       <div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div>
       <div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div>
     </div>
     <div class="stbar">
-      <span class="stxt" id="stxt">Created by Arsh, 16 years old</span>
+      <span class="stxt" id="stxt">🎤 Voice Assistant Active • Wake: "MJ"</span>
       <div class="stats">
         <span>📊 <span id="msgCount">0</span> msgs</span>
         <span>🧠 <span id="mlScore">0</span>% ML</span>
@@ -266,7 +268,7 @@ body.light-mode .news-item{background:rgba(0,85,255,.12);border-color:rgba(0,85,
       </div>
       <div class="irow">
         <div class="iw">
-          <textarea id="inp" placeholder="Ask me anything... (I can search Google!)" rows="1"
+          <textarea id="inp" placeholder="Type or use 🎤 voice (say 'MJ' first)" rows="1"
             onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
         </div>
         <div class="snd" onclick="sendMsg()">➤</div>
@@ -354,7 +356,7 @@ body.light-mode .news-item{background:rgba(0,85,255,.12);border-color:rgba(0,85,
           MJ is an advanced AI platform created by <span style="color:var(--cg);font-weight:700">Arsh</span>, a 16-year-old passionate learner who loves exploring everything about technology, AI, and software development.
         </p>
         <p style="margin-bottom:10px">
-          This AI can search Google for real-time information, fetch news, weather, and sports updates. It's designed to be helpful, responsive, and packed with features.
+          This AI can search Google for real-time information, fetch news, weather, and sports updates. It features a voice assistant with wake word detection - just say "MJ" to activate!
         </p>
         <p>
           Built with ❤️ for learning and innovation. Always improving, always evolving.
@@ -362,9 +364,14 @@ body.light-mode .news-item{background:rgba(0,85,255,.12);border-color:rgba(0,85,
       </div>
     </div>
 
-    <div style="background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(0,85,255,.1));border:1px solid var(--c);border-radius:11px;padding:14px;text-align:center">
-      <div style="font-size:1.4rem;margin-bottom:8px">✨ Made with passion by a young developer</div>
-      <div style="font-size:.85rem;color:var(--dim)">Arsh • 16 Years • Innovating the future</div>
+    <div style="background:rgba(0,212,255,.08);border:1px solid var(--c);border-radius:11px;padding:14px">
+      <div style="font-size:.9rem;color:var(--txt);font-weight:700;margin-bottom:8px">🎤 Voice Features</div>
+      <div style="font-size:.85rem;color:var(--txt);line-height:1.6">
+        <p style="margin-bottom:8px">✅ <strong>Wake Word:</strong> Say "MJ" to activate voice mode</p>
+        <p style="margin-bottom:8px">✅ <strong>Speech Recognition:</strong> Converts your voice to text</p>
+        <p style="margin-bottom:8px">✅ <strong>Text-to-Speech:</strong> Listens and responds naturally</p>
+        <p>✅ <strong>Smart Responses:</strong> Understands context and queries</p>
+      </div>
     </div>
   </div>
 </div>
@@ -380,21 +387,19 @@ body.light-mode .news-item{background:rgba(0,85,255,.12);border-color:rgba(0,85,
 })();
 
 // ── STATE ──
-const S={tts:true,darkMode:true,msgCount:0,mlScore:0,language:'en'};
+const S={tts:true,darkMode:true,msgCount:0,mlScore:0,language:'en',voiceActive:false,listening:false,recognition:null};
 const moods=['😐','😊','🤔','😎','🚀','💡','🎯','✨'];
 
-// Sample data for search/news/weather/sports
-const newsData=[
-  {title:'AI Revolution Transforms Industries',desc:'Latest advancements in AI technology are reshaping businesses worldwide.',source:'Tech News Daily'},
-  {title:'Machine Learning Breakthroughs',desc:'New ML algorithms achieve record-breaking accuracy rates.',source:'AI Research Hub'},
-  {title:'Web3 and AI Integration',desc:'Combining blockchain with AI for enhanced security.',source:'Future Tech'}
-];
+// Initialize Speech Recognition
+const initVoice=()=>{const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(SpeechRecognition){S.recognition=new SpeechRecognition();S.recognition.continuous=true;S.recognition.interimResults=true;S.recognition.lang='en-US';S.recognition.onstart=()=>{S.listening=true;updateVoiceStatus('🎤 Listening...');};S.recognition.onresult=(e)=>{let transcript='';for(let i=e.resultIndex;i<e.results.length;i++){transcript+=e.results[i][0].transcript;if(e.results[i].isFinal)transcript+=' ';}const lower=transcript.trim().toLowerCase();if(lower.includes('mj')&&!S.voiceActive){S.voiceActive=true;updateVoiceStatus('🔴 Voice Activated - Listening for commands...');addMsg('MJ wake word detected! I\'m now listening to your commands.',false);return;}if(S.voiceActive){document.getElementById('inp').value=transcript.trim();if(e.results[e.results.length-1].isFinal){S.recognition.stop();setTimeout(()=>sendMsg(),500);}}};S.recognition.onerror=(e)=>{updateVoiceStatus('⚠️ Error: '+e.error);};S.recognition.onend=()=>{S.listening=false;if(S.voiceActive){updateVoiceStatus('🎤 Ready for command...');}else{updateVoiceStatus('🎤 Say "MJ" to activate');}};}else{toast('❌ Speech Recognition not supported on this device');}};
 
-const sportsData=[
-  {title:'⚽ Football Championship Finals',desc:'Exciting match results from yesterday\'s championship.'},
-  {title:'🏀 Basketball League Updates',desc:'Latest scores and standings from the NBA.'},
-  {title:'🎾 Tennis Masters Tournament',desc:'Top players competing for the grand title.'}
-];
+function toggleVoice(){const btn=document.getElementById('voiceBtn');if(!S.recognition){initVoice();}if(S.listening){S.recognition.stop();S.voiceActive=false;btn.classList.remove('listening');updateVoiceStatus('🎤 Voice inactive - Say "MJ" to start');}else{S.recognition.start();btn.classList.add('listening');}};
+
+function updateVoiceStatus(text){const status=document.getElementById('voiceStatus');status.textContent=text;status.classList.add('show');setTimeout(()=>status.classList.remove('show'),4000);};
+
+// Sample data
+const newsData=[{title:'AI Revolution Transforms Industries',desc:'Latest advancements in AI technology are reshaping businesses worldwide.',source:'Tech News Daily'},{title:'Machine Learning Breakthroughs',desc:'New ML algorithms achieve record-breaking accuracy rates.',source:'AI Research Hub'},{title:'Web3 and AI Integration',desc:'Combining blockchain with AI for enhanced security.',source:'Future Tech'}];
+const sportsData=[{title:'⚽ Football Championship Finals',desc:'Exciting match results from yesterday\'s championship.'},{title:'🏀 Basketball League Updates',desc:'Latest scores and standings from the NBA.'},{title:'🎾 Tennis Masters Tournament',desc:'Top players competing for the grand title.'}];
 
 // ── TAB SYSTEM ──
 function switchTab(tab){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById(tab)?.classList.add('active');if(tab==='news')loadNews();if(tab==='weather')loadWeather();if(tab==='sports')loadSports();}
@@ -408,8 +413,7 @@ function addMsg(txt,isUser=false){const m=document.getElementById('msgs');const 
 
 function handleQuery(query){const inp=document.getElementById('inp');inp.value=query;sendMsg();}
 
-function sendMsg(){const inp=document.getElementById('inp');const txt=inp.value.trim().toLowerCase();if(!txt)return;addMsg(inp.value,true);inp.value='';autoResize(inp);const orb=document.getElementById('orbCore');if(orb){orb.classList.add('spk');setTimeout(()=>orb.classList.remove('spk'),1200);}
-updateMood();S.msgCount++;document.getElementById('msgCount').textContent=S.msgCount;S.mlScore=Math.min(100,S.mlScore+Math.floor(Math.random()*10));document.getElementById('mlScore').textContent=S.mlScore;setTimeout(()=>{handleQueryLogic(txt);},800);}
+function sendMsg(){const inp=document.getElementById('inp');const txt=inp.value.trim().toLowerCase();if(!txt)return;addMsg(inp.value,true);inp.value='';autoResize(inp);const orb=document.getElementById('orbCore');if(orb){orb.classList.add('spk');setTimeout(()=>orb.classList.remove('spk'),1200);}updateMood();S.msgCount++;document.getElementById('msgCount').textContent=S.msgCount;S.mlScore=Math.min(100,S.mlScore+Math.floor(Math.random()*10));document.getElementById('mlScore').textContent=S.mlScore;setTimeout(()=>{handleQueryLogic(txt);},800);}
 
 function handleQueryLogic(txt){if(txt.includes('who made you')||txt.includes('creator')||txt.includes('who created you')){addMsg('🎉 I was made by Arsh, a 16-year-old boy who is incredibly passionate about learning everything! He loves exploring AI, ML, web development, and building cool projects like me. Arsh is always eager to learn new things and push the boundaries of what\'s possible with technology!',false);}
 else if(txt.includes('news')){switchTab('news');addMsg('📰 Fetching latest news for you...',false);}
@@ -437,7 +441,7 @@ function loadWeather(){document.getElementById('tempValue').textContent='28°C';
 function loadSports(){const sportsList=document.getElementById('sportsList');sportsList.innerHTML='';sportsData.forEach(s=>{const item=document.createElement('div');item.className='news-item';item.innerHTML=`<div class="news-title">${s.title}</div><div class="news-desc">${s.desc}</div>`;sportsList.appendChild(item);});addMsg('⚽ Sports updates loaded!',false);}
 
 // ── INIT ──
-document.addEventListener('DOMContentLoaded',()=>{updateMood();});
+document.addEventListener('DOMContentLoaded',()=>{updateMood();initVoice();addMsg('👋 Welcome! I\'m MJ, your AI assistant. Say "MJ" to activate voice mode, or type your questions here!',false);});
 </script>
 </body>
 </html>
